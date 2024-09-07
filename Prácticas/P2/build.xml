@@ -1,0 +1,37 @@
+<project name="C_1_Analyzer" default="run" basedir=".">
+    
+    <!-- Definición de propiedades -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    
+    <!-- Limpiar el directorio de compilación -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- Generar el archivo Lexer.java usando JFlex -->
+    <target name="generate">
+        <exec executable="jflex">
+            <arg value="src/main/jflex/Lexer.flex"/>
+        </exec>
+    </target>
+
+    <!-- Compilar Lexer.java -->
+    <target name="compile" depends="generate">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <include name="main/jflex/Lexer.java"/>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el analizador léxico -->
+    <target name="run" depends="compile">
+        <java classname="main.jflex.Lexer" fork="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="src/tst/prueba.txt"/>
+        </java>
+    </target>
+
+</project>
