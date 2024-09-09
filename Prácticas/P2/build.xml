@@ -4,9 +4,11 @@
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="build"/>
     
-    <!-- Limpiar el directorio de compilación -->
+    <!-- Limpiar el directorio de compilación y eliminar Lexer.java -->
     <target name="clean">
         <delete dir="${build.dir}"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java~"/>
     </target>
 
     <!-- Generar el archivo Lexer.java usando JFlex -->
@@ -35,3 +37,4 @@
     </target>
 
 </project>
+
