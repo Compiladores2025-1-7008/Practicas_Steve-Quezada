@@ -19,7 +19,7 @@
     <!-- Compilar Lexer.java -->
     <target name="compile" depends="generate">
         <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
             <include name="main/jflex/Lexer.java"/>
         </javac>
     </target>

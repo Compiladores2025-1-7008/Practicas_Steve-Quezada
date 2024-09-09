@@ -1,16 +1,40 @@
 package main.java;
 
+/**
+ * Clase Token que representa una unidad léxica que será reconocida por el analizador léxico.
+ * Un token contiene un tipo y el lexema asociado.
+ */
 public class Token {
-    private ClaseLexica clase;
+    private ClaseLexica tipo;
+
     private String lexema;
 
-    public Token(ClaseLexica clase, String lexema) {
-        this.clase = clase;
+    /**
+     * Constructor de la clase Token.
+     * 
+     * @param tipo   Tipo del token, que pertenece a una clase léxica.
+     * @param lexema Lexema correspondiente al token.
+     */
+    public Token(ClaseLexica tipo, String lexema) {
+        this.tipo = tipo;
         this.lexema = lexema;
     }
 
-    @Override
-    public String toString() {
-        return "<" + this.clase + "," + this.lexema + ">";
+    /**
+     * Método para obtener el tipo del token.
+     * 
+     * @return El tipo del token como un objeto de la clase ClaseLexica.
+     */
+    public ClaseLexica getTipo() {
+        return tipo;
+    }
+
+    /**
+     * Método para obtener el lexema del token.
+     * 
+     * @return El lexema como una cadena de caracteres.
+     */
+    public String getLexema() {
+        return lexema;
     }
 }
