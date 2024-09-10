@@ -1,6 +1,7 @@
 <p  align="center">
   <img  width="200"  src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png"  alt="">  <br>Compiladores  2025-1 <br>
-  Práctica 2: Analizadores léxicos con Lex (JFlex) <br> Profesora: Ariel Adara Mercado Martínez
+  Práctica 2: Analizadores léxicos con Lex (JFlex) <br> Profesora: Ariel Adara Mercado Martínez<br> 
+  Alumno: Kevin Steve Quezada Ordoñez 
 </p>
 
 ## Analizador léxico para el lenguaje C_1
@@ -13,35 +14,66 @@ Lex es una herramienta para generar analizadores léxicos, que se deben describi
 ### Estructura del directorio
 ```c++
 P2
-├── README.md
+├── build.xml
+├── Readme.md
 └── src
     ├── main
-    │   ├── java
-    │   │   ├── ClaseLexica.java // Enum que contendrá todas las clases léxicas
-    │   │   └── Token.java // Estructura de datos que representa un componente léxico
-    │   └── jflex
-    │       └── Lexer.flex // Definición de nuestro analizador léxico
+    │   ├── java
+    │   │   ├── ClaseLexica.java
+    │   │   └── Token.java
+    │   └── jflex
+    │       ├── Lexer[EXTRA].flex
+    │       └── Lexer.flex
     └── tst
-        └── prueba.txt // Archivo de entrada de prueba
+        ├── prueba1.txt
+        ├── prueba2.txt
+        ├── prueba3.txt
+        ├── prueba4.txt
+        └── prueba.txt
 ```
 
-### Uso
+### Flujo General de los Comandos.
+He configurado dos procesos distintos, que dependen de diferentes archivos `.flex`. El primer proceso de **Ejercicios** con `Lexer.flex`  y el segundo de **Extras** con `Lexer[EXTRA].flex`.
 
-#### Compilación
-
+#### Se genera el archivo Lexer.java usando JFlexz.
 ```bash
-$ jflex src/main/jflex/Lexer.flex
-$ javac --source-path src -d build src/main/jflex/Lexer.java
+$ ant generate
+$ ant generateExtra
 ```
 
-#### Ejecución
-
+#### Se compila Lexer.java.
 ```bash
-$ java -cp build main.jflex.Lexer input.txt  
+$ ant compile
+$ ant compileExtra
 ```
 
+#### Se ejecuta el analizador léxico por defecto.
+```bash
+$ ant run
+$ ant runExtra
+```
 
-#### Salida esperada
+#### Se limpia el directorio de compilación.
+```bash
+$ ant clean
+```
+
+### Se ejecuta el analizador léxico con una prueba definida `pruebaX`.
+```bash
+$ ant run -Dtest.file=src/tst/prueba1.txt \\ Inválido
+$ ant runExtra -Dtest.file=src/tst/prueba1.txt \\ Inválido
+
+$ ant run -Dtest.file=src/tst/prueba2.txt \\ Válido
+$ ant runExtra -Dtest.file=src/tst/prueba2.txt \\ Válido
+
+$ ant run -Dtest.file=src/tst/prueba3.txt \\ Inválido
+$ ant runExtra -Dtest.file=src/tst/prueba3.txt \\ Inválido
+
+$ ant run -Dtest.file=src/tst/prueba4.txt \\ Válido
+$ ant runExtra -Dtest.file=src/tst/prueba4.txt \\ Válido
+```
+
+### Salida esperada con `prueba.txt`
 ```
 <INT, int>
 <FLOAT, float>
@@ -81,6 +113,3 @@ $ java -cp build main.jflex.Lexer input.txt
 4. Modificar lo necesario para producir una salida que considere no guardar lexemas que son los únicos miembros de su clase léxica. (0.5 pts.)
 5. Documentar el código. (0.25 pts.)
 6. Proponer 4 archivos de prueba nuevos, 2 válidos y 2 inválidos. (0.25 pts.)
-
-
-
