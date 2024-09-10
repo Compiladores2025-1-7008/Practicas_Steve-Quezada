@@ -1,6 +1,8 @@
 /**
- * Escáner que detecta el lenguaje C_1
-*/
+ * Escáner que detecta tokens del lenguaje C_1 utilizando JFlex.
+ * Este analizador léxico reconoce palabras clave, identificadores, 
+ * números y símbolos en el lenguaje C_1.
+ */
 
 package main.jflex;
 
@@ -48,10 +50,20 @@ numeroInt = {digito}+
   "while"     { reportarToken(ClaseLexica.WHILE, yytext()); }
   
   // Símbolos
-  ";"         { reportarToken(ClaseLexica.PYC, yytext()); }
+  ";"         { reportarToken(ClaseLexica.PYC,  yytext()); }
   ","         { reportarToken(ClaseLexica.COMA, yytext()); }
   "("         { reportarToken(ClaseLexica.LPAR, yytext()); }
   ")"         { reportarToken(ClaseLexica.RPAR, yytext()); }
+  "{"         { reportarToken(ClaseLexica.LLLA, yytext()); }
+  "}"         { reportarToken(ClaseLexica.RLLA, yytext()); }
+
+  // Operadores
+  "="         { reportarToken(ClaseLexica.ASIGNACION, yytext()); }
+  "=="        { reportarToken(ClaseLexica.IGUALDAD, yytext()); }
+  ">"         { reportarToken(ClaseLexica.MAYORQUE, yytext()); }
+  "<"         { reportarToken(ClaseLexica.MENORQUE, yytext()); }
+  "+"         { reportarToken(ClaseLexica.SUMA, yytext()); }
+  "-"         { reportarToken(ClaseLexica.RESTA, yytext()); }
 
   // Números
   {numeroFloat} { reportarToken(ClaseLexica.NUMERO, yytext()); }

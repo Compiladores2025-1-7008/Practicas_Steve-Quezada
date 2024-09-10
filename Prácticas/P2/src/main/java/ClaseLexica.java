@@ -20,8 +20,16 @@ public enum ClaseLexica {
     NUMERO,
 
     // Símbolos
-    PYC,
-    COMA,
-    LPAR,
-    RPAR
+    PYC,        
+    COMA,       
+    LPAR,       
+    RPAR,       
+    LLLA,   
+    RLLA,   
+    ASIGNACION, 
+    IGUALDAD,   
+    MAYORQUE,   
+    MENORQUE,   
+    SUMA,       
+    RESTA       
 }
