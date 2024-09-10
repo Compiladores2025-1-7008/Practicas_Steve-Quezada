@@ -1,0 +1,66 @@
+<project name="C_1_Analyzer" default="run" basedir=".">
+    
+    <!-- Definición de propiedades -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <!-- Archivo por defecto -->
+    <property name="test.file" value="src/tst/prueba.txt"/>
+    
+    <!-- Limpiar el directorio de compilación -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java~"/>
+    </target>
+
+    <!-- Generar el archivo Lexer.java usando JFlex -->
+    <target name="generate">
+        <exec executable="jflex">
+            <arg value="src/main/jflex/Lexer.flex"/>
+        </exec>
+    </target>
+
+    <!-- Generar el archivo Lexer[EXTRA].java usando JFlex -->
+    <target name="generateExtra">
+        <exec executable="jflex">
+            <arg value="src/main/jflex/Lexer[EXTRA].flex"/>
+        </exec>
+    </target>
+
+    <!-- Compilar Lexer.java -->
+    <target name="compile" depends="generate">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <include name="main/jflex/Lexer.java"/>
+        </javac>
+    </target>
+
+    <!-- Compilar Lexer[EXTRA].java -->
+    <target name="compileExtra" depends="generateExtra">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <include name="main/jflex/Lexer.java"/>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el analizador léxico -->
+    <target name="run" depends="clean, compile">
+        <java classname="main.jflex.Lexer" fork="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="${test.file}"/>
+        </java>
+    </target>
+
+    <!-- Ejecutar el analizador léxico extra -->
+    <target name="runExtra" depends="clean, compileExtra">
+        <java classname="main.jflex.Lexer" fork="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="${test.file}"/>
+        </java>
+    </target>
+
+</project>

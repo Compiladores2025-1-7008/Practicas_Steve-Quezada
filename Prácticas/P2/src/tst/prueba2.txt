@@ -1,0 +1,6 @@
+if (x == 1) {
+    float result = 2.5e3;
+    x = x + 1;
+} else {
+    int counter = 100;
+}
