@@ -1,0 +1,41 @@
+<project name="Práctica 3: Implementación de un Analizador Sintáctico de descenso recursivo" default="run" basedir=".">
+    
+    <!-- Definición de propiedades -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="test.file" value="tst/prueba.txt"/>
+    
+    <!-- Limpiar el directorio de compilación -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java"/>
+        <delete file="${src.dir}/main/jflex/Lexer.java~"/>
+    </target>
+
+    <!-- Generar el archivo Lexer.java usando JFlex -->
+    <target name="generate">
+        <exec executable="jflex">
+            <arg value="src/main/jflex/Lexer.flex"/>
+        </exec>
+    </target>
+
+    <!-- Compilar los archivos .java -->
+    <target name="compile" depends="generate">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <include name="main/java/Main.java"/>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el analizador con paquete main.java -->
+    <target name="run" depends="clean, compile">
+        <java classname="main.java.Main" fork="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="${test.file}"/>
+        </java>
+    </target>
+
+</project>
+
