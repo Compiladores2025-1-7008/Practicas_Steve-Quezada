@@ -14,10 +14,14 @@
 
     <!-- Generar el archivo Lexer.java usando JFlex -->
     <target name="generate">
-        <exec executable="jflex">
-            <arg value="src/main/jflex/Lexer.flex"/>
-        </exec>
-    </target>
+    <condition property="jflex.command" value="jflex.bat" else="jflex">
+        <os family="windows"/>
+    </condition>
+
+    <exec executable="${jflex.command}">
+        <arg value="src/main/jflex/Lexer.flex"/>
+    </exec>
+</target>
 
     <!-- Compilar los archivos .java -->
     <target name="compile" depends="generate">
