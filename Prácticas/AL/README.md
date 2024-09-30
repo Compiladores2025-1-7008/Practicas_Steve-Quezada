@@ -26,12 +26,7 @@ AL
 ```
 
 ### Flujo General de los Comandos
-A continuación, se muestra el flujo de trabajo para compilar y ejecutar el analizador léxico utilizando Ant:
-
-#### Generar y compilar el Lexer:
-```bash
-$ ant compile
-```
+A continuación, se muestra el flujo de trabajo para ejecutar el analizador léxico utilizando Ant:
 
 #### Ejecutar el analizador léxico:
 ```bash
