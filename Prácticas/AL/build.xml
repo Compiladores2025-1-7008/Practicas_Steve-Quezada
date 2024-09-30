@@ -1,0 +1,31 @@
+<project name="Programa de Análisis Léxico" default="run" basedir=".">
+    
+    <!-- Definición de propiedades -->
+    <property name="src.dir" value="src"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="input.file" value="input.txt"/>
+    
+    <!-- Limpiar el directorio binario -->
+    <target name="clean">
+        <delete dir="${bin.dir}"/>
+    </target>
+
+    <!-- Compilar los archivos .java -->
+    <target name="compile">
+        <mkdir dir="${bin.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${bin.dir}" includeantruntime="false">
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el analizador léxico -->
+    <target name="run" depends="clean, compile">
+        <java classname="Lexer" fork="true">
+            <classpath>
+                <pathelement path="${bin.dir}"/>
+            </classpath>
+            <arg value="${input.file}"/>
+        </java>
+    </target>
+
+</project>
