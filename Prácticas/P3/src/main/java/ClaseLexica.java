@@ -43,4 +43,6 @@ public class ClaseLexica {
     public static final int MENORIGUAL = 24;     // <=
     public static final int DIFERENTE = 25;      // !=
 
+    // Fin de archivo
+    public static final int EOF = 26;
 }

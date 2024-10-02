@@ -23,7 +23,7 @@ public interface ParserInterface {
     public void parse();
 
     /**
-     * Método del símbolo incial, una vez que termina sin reportar error,
+     * Método del símbolo inicial, una vez que termina sin reportar error,
      * se concluye que la cadena pertenece al lenguaje.
      */
     public void S();
