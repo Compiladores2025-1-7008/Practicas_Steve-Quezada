@@ -1,40 +1,149 @@
-# [Compiladores 2025-1] Grupo 7008 
-## Práctica 3 Repositorio base
-
+<p  align="center">
+  <img  width="200"  src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png"  alt="">  <br>Compiladores  2025-1 <br>
+  Práctica 3: Implementación de un Analizador Sintáctico de descenso recursivo <br> 
+  Profesora: Ariel Adara Mercado Martínez <br>
+  Ayudante: Janeth Pablo Martínez <br>
+  Ayud. Lab.: Carlos Gerardo Acosta Hernández <br>
+  Alumno: Kevin Steve Quezada Ordoñez <br>
+</p>
 
 ### Estructura del directorio
 ```c++
 P3
+├── build.xml
+├── Practica_3.pdf
 ├── README.md
-├── src
-│   └── main
-│       ├── java
-│       │   ├── ClaseLexica.java // Clase que reemplaza el enum de P2
-│       │   ├── Main.java // Clase con el método main
-│       │   ├── Parser.java // Implementación del An. Sintáctico
-│       │   ├── ParserInterface.java // interfaz de an. sintácticos de descenso recursivo
-│       │   └── Token.java // Clase para componentes léxicos
-│       └── jflex
-│           └── Lexer.flex // Definición del An. Léxico
-└── tst
-    └── prueba.txt // Archivo de entrada prueba que debe ser aceptado por el parser
-
+│   
+├───src
+│   └───main
+│       ├───java
+│       │       ClaseLexica.java
+│       │       Colors.java
+│       │       Main.java
+│       │       Parser.java
+│       │       ParserInterface.java
+│       │       Token.java
+│       │       
+│       └───jflex
+│               Lexer.flex
+│
+└───tst
+        prueba.txt
 ```
 
-### Uso
+### Flujo General de los Comandos
 
-#### Compilacion
+### Ejecutar el analizador léxico:
+Este comando compilará el proyecto y luego ejecutará el analizador léxico:
 
 ```bash
-$ jflex src/main/jflex/Lexer.flex
-$ javac --source-path src -d build src/main/jflex/Main.java
+$ ant run
 ```
 
-#### Ejecucion
+### Limpiar el directorio de compilación:
+Este comando eliminará todos los archivos generados en el proceso de compilación:
 
 ```bash
-$ java -cp build main.java.Main tst/prueba.txt  
+$ ant clean
 ```
+
+### Generar el analizador léxico:
+Si necesitas regenerar el archivo `Lexer.java`:
+
+```bash
+$ ant generate
+```
+
+### Compilar el proyecto:
+Si deseas compilar el proyecto sin ejecutarlo:
+
+```bash
+$ ant compile
+```
+
+### Archivo de entrada por defecto `prueba.txt`
+```
+int a, _b;
+float c, d;
+
+a = 1 + 3;
+_b = a + 23;
+```
+
+### Archivos de prueba Validos.
+
+#### Ejemplo 1:
+```
+int a, b, c;
+float x, y, z;
+
+a = 5;
+b = 10;
+c = a + b;
+
+if (a < b) {
+    x = 1.5;
+    y = x * 2;
+} else {
+    z = 3.5;
+}
+
+while (c > 0) {
+    c = c - 1;
+}
+```
+
+#### Ejemplo 2:
+```
+int a, b;
+float c;
+{
+    a = 5;
+    b = 10;
+    if (a < b) {
+        c = a + b * 2;
+        while (c >= 10.5) {
+            c = c / 2;
+        }
+    } else {
+        a = b - 3;
+    }
+}
+```
+
+### Archivos de prueba Inválidos.
+
+#### Ejemplo 1:
+```
+int p, q;
+float r;
+{
+    p = 8;
+    q = (p + 2;
+    if (q > p) {
+        r = q * 2;
+        while r >= 10 {
+            r = r / 2;
+        }
+    }
+}
+```
+
+#### Ejemplo 2:
+```
+int a, b;
+{
+    a = 10;
+    b = a * 2;
+    if (b >= 20) {
+        a = a + 1;
+        b = b - a;
+    } else {
+        a = b * 3;
+    }
+    b = a / 2;
+```
+
 
 #### Ejercicios
 Para la gramática G = ( N, Σ, P, S), descrita por las siguientes producciones: 
