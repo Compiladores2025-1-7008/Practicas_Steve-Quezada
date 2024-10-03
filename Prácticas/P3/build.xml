@@ -14,25 +14,31 @@
 
     <!-- Generar el archivo Lexer.java usando JFlex -->
     <target name="generate">
-    <condition property="jflex.command" value="jflex.bat" else="jflex">
-        <os family="windows"/>
-    </condition>
+        <condition property="jflex.command" value="jflex.bat" else="jflex">
+            <os family="windows"/>
+        </condition>
 
-    <exec executable="${jflex.command}">
-        <arg value="src/main/jflex/Lexer.flex"/>
-    </exec>
-</target>
+        <exec executable="${jflex.command}">
+            <arg value="--outdir"/>
+            <arg value="${src.dir}/main/jflex"/>
+            <arg value="${src.dir}/main/jflex/Lexer.flex"/>
+        </exec>
+    </target>
 
-    <!-- Compilar los archivos .java -->
-    <target name="compile" depends="generate">
+    <!-- Compilar los archivos -->
+    <target name="compile" depends="clean, generate">
         <mkdir dir="${build.dir}"/>
+        
         <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
-            <include name="main/java/Main.java"/>
+            <classpath>
+                <pathelement location="${src.dir}"/>
+            </classpath>
+            <include name="**/*.java"/>
         </javac>
     </target>
 
-    <!-- Ejecutar el analizador con paquete main.java -->
-    <target name="run" depends="clean, compile">
+    <!-- Ejecutar el analizador -->
+    <target name="run" depends="compile">
         <java classname="main.java.Main" fork="true">
             <classpath>
                 <pathelement path="${build.dir}"/>
@@ -42,4 +48,3 @@
     </target>
 
 </project>
-

@@ -3,138 +3,269 @@ package main.java;
 import java.io.IOException;
 import main.jflex.Lexer;
 
+/**
+ * Clase Parser que implementa un analizador sintáctico de descenso recursivo.
+ * 
+ * @author steve-quezada
+ */
 public class Parser implements ParserInterface {
-    private Lexer lexer;
-    private int actual;
+    private Lexer analizadorLexico;
+    private int tokenActual;
+    private int nivelIndentacion = 0;
 
-    public Parser(Lexer lexer) {
-        this.lexer = lexer;
+    /**
+     * Constructor de la clase Parser.
+     * 
+     * @param analizadorLexico El analizador léxico que se utilizará para obtener
+     *                         los tokens.
+     */
+    public Parser(Lexer analizadorLexico) {
+        this.analizadorLexico = analizadorLexico;
     }
 
+    /**
+     * Imprime un mensaje con la indentación actual y el color especificado.
+     * 
+     * @param mensaje El mensaje a imprimir.
+     * @param color   El color del mensaje.
+     */
+    private void imprimirConIndentacion(String mensaje, String color) {
+        for (int i = 0; i < nivelIndentacion; i++) {
+            System.out.print("  ");
+        }
+        Colors.println(mensaje, color);
+    }
+
+    /**
+     * Incrementa el nivel de indentación.
+     */
+    private void incrementarIndentacion() {
+        nivelIndentacion++;
+    }
+
+    /**
+     * Decrementa el nivel de indentación.
+     */
+    private void decrementarIndentacion() {
+        nivelIndentacion--;
+    }
+
+    /**
+     * Consume el token actual si coincide con la clase léxica esperada.
+     * 
+     * @param claseLexica La clase léxica esperada.
+     */
     @Override
     public void eat(int claseLexica) {
-        if (actual == claseLexica) {
+        if (tokenActual == claseLexica) {
             try {
-                actual = lexer.yylex();
+                int tokenPrevio = tokenActual;
+                int lineaPrevia = analizadorLexico.getLine(); 
+                tokenActual = analizadorLexico.yylex();
+                if (tokenActual != ClaseLexica.EOF) {
+                    Colors.println("\nToken Previo: " + ClaseLexica.getNombreClase(tokenPrevio) + " (línea: "
+                            + lineaPrevia + ") -> Token Nuevo: " + ClaseLexica.getNombreClase(tokenActual) + " (línea: "
+                            + analizadorLexico.getLine() + ")", Colors.GRAY_DARK);
+                    System.out.println();
+                } else {
+                    Colors.print("\nToken Previo: " + ClaseLexica.getNombreClase(tokenPrevio) + " (línea: "
+                            + lineaPrevia + ") (línea: " + analizadorLexico.getLine() + ")", Colors.BLUE_LIGHT);
+                    System.out.println();
+                }
             } catch (IOException ioe) {
-                System.err.println("Failed to read next token");
+                Colors.println("No se pudo leer el siguiente token\n", Colors.RED);
             }
         } else {
-            error("Se esperaba el token de clase " + claseLexica + " pero se encontró " + actual);
+            error("Se esperaba el token de clase " + ClaseLexica.getNombreClase(claseLexica) + " pero se encontró "
+                    + ClaseLexica.getNombreClase(tokenActual));
         }
     }
 
+    /**
+     * Maneja los errores de sintaxis.
+     * 
+     * @param mensaje El mensaje de error.
+     */
     @Override
-    public void error(String msg) {
-        System.err.println("ERROR DE SINTAXIS: " + msg + " en la línea " + lexer.getLine());
-        System.exit(1); 
+    public void error(String mensaje) {
+        Colors.println("\nERROR DE SINTAXIS: " + mensaje + " en la línea " + analizadorLexico.getLine(), Colors.RED);
+        System.exit(1);
     }
 
+    /**
+     * Inicia el análisis sintáctico.
+     */
     @Override
     public void parse() {
+        Colors.println("\nInicio del análisis sintáctico", Colors.TEAL);
+
         try {
-            this.actual = lexer.yylex();
+            this.tokenActual = analizadorLexico.yylex();
         } catch (IOException ioe) {
-            System.err.println("Error: No fue posible obtener el primer token de la entrada.");
+            Colors.println("ERROR: No fue posible obtener el primer token de la entrada.\n", Colors.RED);
             System.exit(1);
         }
-        programa(); 
-        if (actual == ClaseLexica.EOF) 
-            System.out.println("La cadena es aceptada");
+        programa();
+        if (tokenActual == ClaseLexica.EOF)
+            Colors.print("\nLa cadena es aceptada", Colors.GREEN);
         else
             error("La cadena no pertenece al lenguaje generado por la gramática");
     }
 
+    /**
+     * Método que inicia el análisis sintáctico.
+     */
     @Override
     public void S() {
         programa();
     }
 
+    /**
+     * Analiza la estructura.
+     */
     private void programa() {
+        System.out.println();
+        imprimirConIndentacion("\nParsing programa...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
         declaraciones();
         sentencias();
+        decrementarIndentacion();
+        imprimirConIndentacion("\nFin del análisis sintáctico.", Colors.TEAL);
     }
 
+    /**
+     * Analiza las declaraciones.
+     */
     private void declaraciones() {
-        if (actual == ClaseLexica.INT || actual == ClaseLexica.FLOAT) {
+        imprimirConIndentacion("Parsing declaraciones...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.INT || tokenActual == ClaseLexica.FLOAT) {
             declaracion();
-            declaracionesPrima();
-        } else {
-            error("Se esperaba 'int' o 'float'");
+            declaracionesAdicionales();
+        }
+        decrementarIndentacion();
+    }
+
+    /**
+     * Analiza las declaraciones adicionales.
+     */
+    private void declaracionesAdicionales() {
+        if (tokenActual == ClaseLexica.INT || tokenActual == ClaseLexica.FLOAT) {
+            declaracion();
+            declaracionesAdicionales();
         }
     }
 
-    private void declaracionesPrima() {
-        if (actual == ClaseLexica.INT || actual == ClaseLexica.FLOAT) {
-            declaracion();
-            declaracionesPrima();
-        }
-    }
-
+    /**
+     * Analiza una declaración.
+     */
     private void declaracion() {
+        imprimirConIndentacion("Parsing declaracion...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
         tipo();
-        listaVar();
+        listaVariables();
         eat(ClaseLexica.PYC);
+        decrementarIndentacion();
     }
 
+    /**
+     * Analiza el tipo de una declaración.
+     */
     private void tipo() {
-        if (actual == ClaseLexica.INT) {
+        imprimirConIndentacion("Parsing tipo...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.INT) {
             eat(ClaseLexica.INT);
-        } else if (actual == ClaseLexica.FLOAT) {
+        } else if (tokenActual == ClaseLexica.FLOAT) {
             eat(ClaseLexica.FLOAT);
         } else {
             error("Se esperaba 'int' o 'float'");
         }
+        decrementarIndentacion();
     }
 
-    private void listaVar() {
-        if (actual == ClaseLexica.ID) {
+    /**
+     * Analiza la lista de variables en una declaración.
+     */
+    private void listaVariables() {
+        imprimirConIndentacion("Parsing listaVariables...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.ID) {
             eat(ClaseLexica.ID);
-            listaVarPrima();
+            listaVariablesAdicionales();
         } else {
             error("Se esperaba un identificador");
         }
+        decrementarIndentacion();
     }
 
-    private void listaVarPrima() {
-        if (actual == ClaseLexica.COMA) {
+    /**
+     * Analiza las variables adicionales en una lista de variables.
+     */
+    private void listaVariablesAdicionales() {
+        if (tokenActual == ClaseLexica.COMA) {
             eat(ClaseLexica.COMA);
-            eat(ClaseLexica.ID);
-            listaVarPrima();
+            if (tokenActual == ClaseLexica.ID) {
+                eat(ClaseLexica.ID);
+                listaVariablesAdicionales();
+            } else {
+                error("Se esperaba un identificador después de la coma");
+            }
         }
     }
 
+    /**
+     * Analiza las sentencias.
+     */
     private void sentencias() {
-        if (actual == ClaseLexica.ID || actual == ClaseLexica.IF || actual == ClaseLexica.WHILE) {
+        imprimirConIndentacion("Parsing sentencias...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.LLLA) {
+            eat(ClaseLexica.LLLA);
+            sentenciasAdicionales();
+            eat(ClaseLexica.RLLA);
+        } else if (tokenActual == ClaseLexica.ID || tokenActual == ClaseLexica.IF || tokenActual == ClaseLexica.WHILE) {
             sentencia();
-            sentenciasPrima();
+            sentenciasAdicionales();
+        }
+        decrementarIndentacion();
+    }
+
+    /**
+     * Analiza las sentencias adicionales.
+     */
+    private void sentenciasAdicionales() {
+        if (tokenActual == ClaseLexica.ID || tokenActual == ClaseLexica.IF || tokenActual == ClaseLexica.WHILE) {
+            sentencia();
+            sentenciasAdicionales();
+        } else if (tokenActual == ClaseLexica.RLLA || tokenActual == ClaseLexica.EOF) {
         } else {
-            error("Se esperaba un identificador, 'if' o 'while'");
+            error("Se esperaba una sentencia o '}'");
         }
     }
 
-    private void sentenciasPrima() {
-        if (actual == ClaseLexica.ID || actual == ClaseLexica.IF || actual == ClaseLexica.WHILE) {
-            sentencia();
-            sentenciasPrima();
-        }
-    }
-
+    /**
+     * Analiza una sentencia.
+     */
     private void sentencia() {
-        if (actual == ClaseLexica.ID) {
+        imprimirConIndentacion("Parsing sentencia...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.ID) {
             eat(ClaseLexica.ID);
             eat(ClaseLexica.ASIGNACION);
             expresion();
             eat(ClaseLexica.PYC);
-        } else if (actual == ClaseLexica.IF) {
+        } else if (tokenActual == ClaseLexica.IF) {
             eat(ClaseLexica.IF);
             eat(ClaseLexica.LPAR);
             expresion();
             eat(ClaseLexica.RPAR);
             sentencias();
-            eat(ClaseLexica.ELSE);
-            sentencias();
-        } else if (actual == ClaseLexica.WHILE) {
+            if (tokenActual == ClaseLexica.ELSE) {
+                eat(ClaseLexica.ELSE);
+                sentencias();
+            }
+        } else if (tokenActual == ClaseLexica.WHILE) {
             eat(ClaseLexica.WHILE);
             eat(ClaseLexica.LPAR);
             expresion();
@@ -143,53 +274,102 @@ public class Parser implements ParserInterface {
         } else {
             error("Se esperaba un identificador, 'if' o 'while'");
         }
+        decrementarIndentacion();
     }
 
+    /**
+     * Analiza una expresión.
+     */
     private void expresion() {
+        imprimirConIndentacion("Parsing expresion...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
         termino();
-        expresionPrima();
+        expresionAdicional();
+        decrementarIndentacion();
     }
 
-    private void expresionPrima() {
-        if (actual == ClaseLexica.SUMA) {
+    /**
+     * Analiza una expresión adicional.
+     */
+    private void expresionAdicional() {
+        if (tokenActual == ClaseLexica.SUMA) {
             eat(ClaseLexica.SUMA);
             termino();
-            expresionPrima();
-        } else if (actual == ClaseLexica.RESTA) {
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.RESTA) {
             eat(ClaseLexica.RESTA);
             termino();
-            expresionPrima();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.MENORQUE) {
+            eat(ClaseLexica.MENORQUE);
+            termino();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.MAYORQUE) {
+            eat(ClaseLexica.MAYORQUE);
+            termino();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.MENORIGUAL) {
+            eat(ClaseLexica.MENORIGUAL);
+            termino();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.MAYORIGUAL) {
+            eat(ClaseLexica.MAYORIGUAL);
+            termino();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.IGUALDAD) {
+            eat(ClaseLexica.IGUALDAD);
+            termino();
+            expresionAdicional();
+        } else if (tokenActual == ClaseLexica.DIFERENTE) {
+            eat(ClaseLexica.DIFERENTE);
+            termino();
+            expresionAdicional();
         }
     }
 
+    /**
+     * Analiza un término en la expresión.
+     */
     private void termino() {
+        imprimirConIndentacion("Parsing termino...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
         factor();
-        terminoPrima();
+        terminoAdicional();
+        decrementarIndentacion();
     }
 
-    private void terminoPrima() {
-        if (actual == ClaseLexica.MULTIPLICACION) {
+    /**
+     * Analiza un término adicional en la expresión.
+     */
+    private void terminoAdicional() {
+        if (tokenActual == ClaseLexica.MULTIPLICACION) {
             eat(ClaseLexica.MULTIPLICACION);
             factor();
-            terminoPrima();
-        } else if (actual == ClaseLexica.DIVISION) {
+            terminoAdicional();
+        } else if (tokenActual == ClaseLexica.DIVISION) {
             eat(ClaseLexica.DIVISION);
             factor();
-            terminoPrima();
+            terminoAdicional();
         }
     }
 
+    /**
+     * Analiza un factor en la expresión.
+     */
     private void factor() {
-        if (actual == ClaseLexica.LPAR) {
+        imprimirConIndentacion("Parsing factor...", Colors.MAGENTA_LIGHT);
+        incrementarIndentacion();
+        if (tokenActual == ClaseLexica.LPAR) {
             eat(ClaseLexica.LPAR);
             expresion();
             eat(ClaseLexica.RPAR);
-        } else if (actual == ClaseLexica.ID) {
+        } else if (tokenActual == ClaseLexica.ID) {
             eat(ClaseLexica.ID);
-        } else if (actual == ClaseLexica.NUMERO_ENTERO || actual == ClaseLexica.NUMERO_REAL) {
-            eat(actual); 
+        } else if (tokenActual == ClaseLexica.NUMERO_ENTERO || tokenActual == ClaseLexica.NUMERO_REAL) {
+            eat(tokenActual);
         } else {
-            error("Se esperaba un número, identificador o expresión entre paréntesis");
+            error("Se esperaba un factor válido");
         }
+        decrementarIndentacion();
     }
 }
