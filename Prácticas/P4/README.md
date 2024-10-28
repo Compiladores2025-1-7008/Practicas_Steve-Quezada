@@ -1,6 +1,11 @@
-<p  align="center">
-  <img  width="200"  src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png"  alt="">  <br>Compiladores  2025-1 <br>
-  Práctica 4: Analizadores sintácticos con BYACC/J (YACC) <br> Profesora: Ariel Adara Mercado Martínez
+<p align="center">
+  <img width="200" src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png" alt="">
+  <br><strong>Compiladores 2025-1</strong> <br>
+  <strong>Práctica 4: Analizadores sintácticos con BYACC/J (YACC)</strong> <br> 
+  <strong>Profesora</strong>: Ariel Adara Mercado Martínez <br>
+  <strong>Ayudante</strong>: Janeth Pablo Martínez <br>
+  <strong>Ayud. Lab.</strong>: Carlos Gerardo Acosta Hernández <br>
+  <strong>Alumno</strong>: Kevin Steve Quezada Ordoñez <br>
 </p>
 
 ## Análisis sintáctico con Yacc
@@ -245,7 +250,6 @@ public static void main(String args[])
   Parser par = new Parser(false);
   par.dotest();
 }
-
 ```
 
 
