@@ -1,4 +1,4 @@
-<project name="Práctica 4: Analizadores sintácticos con BYACC/J (YACC)" default="run" basedir=".">
+<project name="Práctica 4: Analizadores sintácticos con BYACC/J (YACC)" default="run-calculator" basedir=".">
     
     <!-- Definición de propiedades -->
     <property name="src.dir" value="src"/>
@@ -6,14 +6,14 @@
     <property name="byaccj.file" value="${src.dir}/Calculadora_BYACCJ/archivo.y"/>
     
     <!-- Limpiar el directorio de compilación -->
-    <target name="clean">
+    <target name="clean-calculator">
         <delete dir="${build.dir}"/>
         <delete file="${src.dir}/Calculadora_BYACCJ/Parser.java"/>
         <delete file="${src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
     </target>
 
     <!-- Generar Parser.java y ParserVal.java usando byaccj y moverlos al directorio especificado -->
-    <target name="generate">
+    <target name="generate-calculator">
         <!-- Ejecutar byaccj para Windows o Linux -->
         <condition property="byaccj.command" value="D:\\byaccj1.15_win32\\yacc.exe" else="byaccj">
             <os family="windows"/>
@@ -47,7 +47,7 @@
     </target>
 
     <!-- Compilar los archivos generados con javac -->
-    <target name="compile" depends="generate">
+    <target name="compile-calculator" depends="generate-calculator">
         <mkdir dir="${build.dir}"/>
 
         <!-- Compilar usando javac con rutas específicas para Windows y Linux -->
@@ -67,7 +67,7 @@
     </target>
 
     <!-- Ejecutar el analizador -->
-    <target name="run" depends="clean, compile">
+    <target name="run-calculator" depends="clean-calculator, compile-calculator">
         <java classname="Parser" fork="false" failonerror="true">
             <classpath>
                 <pathelement path="${build.dir}"/>

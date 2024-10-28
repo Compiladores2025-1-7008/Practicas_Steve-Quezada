@@ -336,3 +336,39 @@ P = {
 11. Documentar el código. (0.25pts)
 12. Proponer 4 archivos de prueba nuevos, 2 válidos y 2 inválidos. (0.25pts)
 13. Crear un archivo build.xml para ANT que permita la automatización de la generación de los analizadores léxico y sintáctico y la compilación del resultado. 
+
+
+
+
+
+
+
+## Flujo General de los Comandos
+
+<!-- ### Ejecutar el analizador léxico: -->
+<!-- Este comando compilará el proyecto y luego ejecutará el analizador léxico: -->
+
+```bash
+$ ant run-calculator
+```
+
+<!-- ### Limpiar el directorio de compilación: -->
+<!-- Este comando eliminará todos los archivos generados en el proceso de compilación: -->
+
+```bash
+$ ant clean-calculator
+```
+
+<!-- ### Generar el analizador léxico: -->
+<!-- Si necesitas regenerar el archivo `Lexer.java`: -->
+
+```bash
+$ ant generate-calculator
+```
+
+<!-- ### Compilar el proyecto: -->
+<!-- Si deseas compilar el proyecto sin ejecutarlo: -->
+
+```bash
+$ ant compile-calculator
+```
