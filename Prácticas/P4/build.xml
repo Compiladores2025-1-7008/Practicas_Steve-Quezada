@@ -1,76 +1,62 @@
-<project name="Práctica 4: Analizadores sintácticos con BYACC/J (YACC)" default="run-calculator" basedir=".">
-    
-    <!-- Definición de propiedades -->
-    <property name="src.dir" value="src"/>
-    <property name="build.dir" value="src/bin"/>
-    <property name="byaccj.file" value="${src.dir}/Calculadora_BYACCJ/archivo.y"/>
-    
-    <!-- Limpiar el directorio de compilación -->
-    <target name="clean-calculator">
-        <delete dir="${build.dir}"/>
-        <delete file="${src.dir}/Calculadora_BYACCJ/Parser.java"/>
-        <delete file="${src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
+<project name="Calculator" default="run" basedir=".">
+    <!-- Updated properties -->
+    <property name="src.dir" value="src/Calculadora_BYACCJ_JFlex"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="build.dir" value="bin"/>
+
+    <!-- Create required directories -->
+    <target name="init">
+        <mkdir dir="${bin.dir}"/>
     </target>
 
-    <!-- Generar Parser.java y ParserVal.java usando byaccj y moverlos al directorio especificado -->
-    <target name="generate-calculator">
-        <!-- Ejecutar byaccj para Windows o Linux -->
-        <condition property="byaccj.command" value="D:\\byaccj1.15_win32\\yacc.exe" else="byaccj">
+    <!-- Generate Lexer and Parser -->
+    <target name="generate" depends="init">
+        <!-- Generate Lexer -->
+        <condition property="jflex.command" value="jflex.bat" else="jflex">
             <os family="windows"/>
         </condition>
+        <exec executable="${jflex.command}">
+            <arg value="-d"/>
+            <arg value="${src.dir}"/>
+            <arg value="${src.dir}/jflex/Lexer.flex"/>
+        </exec>
 
-        <exec executable="${byaccj.command}" failonerror="true">
+        <!-- Generate Parser -->
+        <exec executable="byaccj">
             <arg value="-J"/>
-            <arg value="${byaccj.file}"/>
+            <arg value="${src.dir}/byacc/Parser.y"/>
         </exec>
-        
-        <!-- Mover archivos generados a la carpeta correcta (Windows/Linux) -->
-        <exec executable="cmd" osfamily="windows">
-            <arg value="/c"/>
-            <arg value="move Parser.java src\\Calculadora_BYACCJ\\"/>
-        </exec>
-
-        <exec executable="cmd" osfamily="windows">
-            <arg value="/c"/>
-            <arg value="move ParserVal.java src\\Calculadora_BYACCJ\\"/>
-        </exec>
-
-        <exec executable="mv" osfamily="unix">
-            <arg value="Parser.java"/>
-            <arg value="${src.dir}/Calculadora_BYACCJ/"/>
-        </exec>
-
-        <exec executable="mv" osfamily="unix">
-            <arg value="ParserVal.java"/>
-            <arg value="${src.dir}/Calculadora_BYACCJ/"/>
-        </exec>
+        <move todir="${src.dir}">
+            <fileset dir="." includes="Parser*.java"/>
+        </move>
     </target>
 
-    <!-- Compilar los archivos generados con javac -->
-    <target name="compile-calculator" depends="generate-calculator">
+    <!-- Clean build files -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete>
+            <fileset dir="${src.dir}" includes="Lexer.java,Parser*.java"/>
+        </delete>
+    </target>
+
+    <!-- Compile all Java files -->
+    <target name="compile" depends="clean, generate">
         <mkdir dir="${build.dir}"/>
-
-        <!-- Compilar usando javac con rutas específicas para Windows y Linux -->
-        <exec executable="javac" osfamily="windows" failonerror="true">
-            <arg value="-d"/>
-            <arg value="${build.dir}"/>
-            <arg value="${src.dir}\\Calculadora_BYACCJ\\Parser.java"/>
-            <arg value="${src.dir}\\Calculadora_BYACCJ\\ParserVal.java"/>
-        </exec>
-
-        <exec executable="javac" osfamily="unix" failonerror="true">
-            <arg value="-d"/>
-            <arg value="${build.dir}"/>
-            <arg value="${src.dir}/Calculadora_BYACCJ/Parser.java"/>
-            <arg value="${src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
-        </exec>
+        
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <classpath>
+                <pathelement location="${src.dir}"/>
+            </classpath>
+            <include name="**/*.java"/>
+        </javac>
     </target>
 
-    <!-- Ejecutar el analizador -->
-    <target name="run-calculator" depends="clean-calculator, compile-calculator">
-        <java classname="Parser" fork="false" failonerror="true">
+    <!-- Run the calculator -->
+    <target name="run" depends="compile">
+        <java classname="Main" fork="false" failonerror="true">
             <classpath>
                 <pathelement path="${build.dir}"/>
+                <pathelement path="."/>
             </classpath>
         </java>
     </target>

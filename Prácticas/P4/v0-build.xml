@@ -1,0 +1,78 @@
+<!-- <project name="Práctica 4: Analizadores sintácticos con BYACC/J (YACC)" default="run-calculatorBYACCJ" basedir=".">
+    
+    <!-- Definición de propiedades -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="src/bin"/>
+    <property name="byaccj.file" value="${src.dir}/Calculadora_BYACCJ/archivo.y"/>
+    
+    <!-- Limpiar el directorio de compilación -->
+    <target name="clean-calculatorBYACCJ">
+        <delete dir="${build.dir}"/>
+        <delete file="${src.dir}/Calculadora_BYACCJ/Parser.java"/>
+        <delete file="${src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
+    </target>
+
+    <!-- Generar Parser.java y ParserVal.java usando byaccj y moverlos al directorio especificado -->
+    <target name="generate-calculatorBYACCJ">
+        <!-- Ejecutar byaccj para Windows o Linux -->
+        <condition property="byaccj.command" value="D:\\byaccj1.15_win32\\yacc.exe" else="byaccj">
+            <os family="windows"/>
+        </condition>
+
+        <exec executable="${byaccj.command}" failonerror="true">
+            <arg value="-J"/>
+            <arg value="${byaccj.file}"/>
+        </exec>
+        
+        <!-- Mover archivos generados a la carpeta correcta (Windows/Linux) -->
+        <exec executable="cmd" osfamily="windows">
+            <arg value="/c"/>
+            <arg value="move Parser.java src\\Calculadora_BYACCJ\\"/>
+        </exec>
+
+        <exec executable="cmd" osfamily="windows">
+            <arg value="/c"/>
+            <arg value="move ParserVal.java src\\Calculadora_BYACCJ\\"/>
+        </exec>
+
+        <exec executable="mv" osfamily="unix">
+            <arg value="Parser.java"/>
+            <arg value="${src.dir}/Calculadora_BYACCJ/"/>
+        </exec>
+
+        <exec executable="mv" osfamily="unix">
+            <arg value="ParserVal.java"/>
+            <arg value="${src.dir}/Calculadora_BYACCJ/"/>
+        </exec>
+    </target>
+
+    <!-- Compilar los archivos generados con javac -->
+    <target name="compile-calculatorBYACCJ" depends="generate-calculatorBYACCJ">
+        <mkdir dir="${build.dir}"/>
+
+        <!-- Compilar usando javac con rutas específicas para Windows y Linux -->
+        <exec executable="javac" osfamily="windows" failonerror="true">
+            <arg value="-d"/>
+            <arg value="${build.dir}"/>
+            <arg value="${src.dir}\\Calculadora_BYACCJ\\Parser.java"/>
+            <arg value="${src.dir}\\Calculadora_BYACCJ\\ParserVal.java"/>
+        </exec>
+
+        <exec executable="javac" osfamily="unix" failonerror="true">
+            <arg value="-d"/>
+            <arg value="${build.dir}"/>
+            <arg value="${src.dir}/Calculadora_BYACCJ/Parser.java"/>
+            <arg value="${src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
+        </exec>
+    </target>
+
+    <!-- Ejecutar el analizador -->
+    <target name="run-calculatorBYACCJ" depends="clean-calculatorBYACCJ, compile-calculatorBYACCJ">
+        <java classname="Parser" fork="false" failonerror="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+        </java>
+    </target>
+
+</project> -->
