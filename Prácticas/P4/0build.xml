@@ -1,6 +1,6 @@
 <project name="Calculator" default="run" basedir=".">
     <!-- Updated properties -->
-    <property name="src.dir" value="src/Analizador_Sintáctico_BYACCJ"/>
+    <property name="src.dir" value="src/Calculadora_BYACCJ_JFlex"/>
     <property name="bin.dir" value="bin"/>
     <property name="build.dir" value="bin"/>
 
