@@ -4,16 +4,14 @@
   import java.util.StringTokenizer;
 %}
 
-/* YACC Declarations */
 %token NUM
 %left '-' '+'
 %left '*' '/'
-%left NEG /* negation--unary minus */
-%right '^' /* exponentiation */
+%left NEG
+%right '^'
 
- /* Grammar follows */
 %%
-input: /* empty string */
+input:
 | input line
 ;
 
@@ -47,26 +45,24 @@ int yylex()
   String s;
   int tok;
   Double d;
-  //System.out.print("yylex ");
   if (!st.hasMoreTokens())
     if (!newline)
       {
 	newline=true;
-	return '\n'; //So we look like classic YACC example
+	return '\n';
       }
     else
       return 0;
   s = st.nextToken();
-  //System.out.println("tok:"+s);
   try
     {
-      d = Double.valueOf(s);/*this may fail*/
-      yylval = new ParserVal(d.doubleValue()); //SEE BELOW
+      d = Double.valueOf(s);
+      yylval = new ParserVal(d.doubleValue());
       tok = NUM;
     }
   catch (Exception e)
     {
-      tok = s.charAt(0);/*if not float, return char*/
+      tok = s.charAt(0);
     }
   return tok;
 }
@@ -79,18 +75,18 @@ void dotest() {
   System.out.println("with spaces, i.e.: '( 3 + 5 ) * 2'");
 
   while (true) {
-    System.out.print("expression: "); // Muestra el mensaje en la misma línea
+    System.out.print("expression: ");
     try {
-      ins = in.readLine();  // Lee la entrada del usuario
-      if (ins == null || ins.isEmpty()) continue; // Maneja entradas vacías
+      ins = in.readLine(); 
+      if (ins == null || ins.isEmpty()) continue;
     } catch (Exception e) {
       System.out.println("Error leyendo la entrada.");
       continue;
     }
 
-    st = new StringTokenizer(ins); // Inicializa el tokenizer con la entrada
-    newline = false; // Resetea el estado de newline
-    yyparse(); // Llama al método de análisis sintáctico
+    st = new StringTokenizer(ins);
+    newline = false;
+    yyparse();
   }
 }
 
