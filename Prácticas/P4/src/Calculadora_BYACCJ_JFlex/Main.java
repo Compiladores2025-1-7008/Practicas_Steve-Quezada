@@ -8,7 +8,7 @@ import java.io.*;
  * @author steve-quezada
  */
 public class Main {
-    private static boolean ejecutando = true;
+    private static boolean isRunning = true;
 
     /**
      * Punto de entrada principal del programa.
@@ -17,8 +17,8 @@ public class Main {
      * @param args argumentos de línea de comando (no utilizados)
      */
     public static void main(String[] args) {
-        mostrarMenu();
-        procesarEntradas();
+        displayMenu();
+        processInputs();
     }
 
     /**
@@ -26,9 +26,9 @@ public class Main {
      * Lee expresiones matemáticas, las evalúa y muestra los resultados.
      * El programa termina cuando el usuario ingresa 'q'.
      */
-    private static void procesarEntradas() {
+    private static void processInputs() {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while (ejecutando) {
+        while (isRunning) {
             System.out.print("\nExpresión > ");
             try {
                 String expresion = in.readLine();
@@ -39,7 +39,7 @@ public class Main {
 
                 if (expresion.equals("q")) {
                     System.out.println("¡Hasta luego!");
-                    ejecutando = false;
+                    isRunning = false;
                     continue;
                 }
 
@@ -56,7 +56,7 @@ public class Main {
      * Muestra el menú principal con las instrucciones y operaciones disponibles.
      * Lista todas las operaciones soportadas.
      */
-    private static void mostrarMenu() {
+    private static void displayMenu() {
         System.out.println("===== Calculadora =====");
         System.out.println("\nOperaciones soportadas:");
         System.out.println("   +  : Suma");
