@@ -14,17 +14,18 @@
  */
 
 %{
+/* Importaciones necesarias para la calculadora */
   import java.io.*;
   import java.lang.Math;
 %}
 
 /* Declaración de tokens y sus tipos */
-%token <dval> NUM    /* Token para números (valores decimales) */
+%token <dval> NUM                     /* Token para números (valores decimales) */
 %token PLUS MINUS TIMES DIVIDE POWER  /* Operadores */
-%token LPAREN RPAREN  /* Paréntesis */
-%token EOL           /* Fin de línea */
+%token LPAREN RPAREN                  /* Paréntesis */
+%token EOL                            /* Fin de archivo */
 
-%type <dval> exp     /* Las expresiones devuelven valores decimales */
+%type <dval> exp                      /* Las expresiones devuelven valores decimales */
 
 /* Precedencia y asociatividad de operadores (de menor a mayor precedencia) */
 %left PLUS MINUS     /* + y - son asociativos por la izquierda */
@@ -33,9 +34,9 @@
 %nonassoc NEG        /* - unario tiene la mayor precedencia */
 
 %%
-/* Reglas de la gramática con acciones semánticas */
+/* Reglas de producción de la gramática con acciones semánticas */
 
-input: /* empty string */
+input:
 | input line
 ;
 
@@ -57,7 +58,7 @@ exp: NUM { $$ = $1; }
 
 /* Código de soporte */
 
-private Lexer lexer;          // Analizador léxico
+private Lexer lexer;           // Analizador léxico
 private String expression;     // Expresión actual siendo evaluada
 
 /**

@@ -1,3 +1,5 @@
+package src.Calculadora_BYACCJ_JFlex;
+
 /* 
  * Analizador Léxico para Calculadora
  * 
