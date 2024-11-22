@@ -1,57 +1,228 @@
-<project name="Calculator" default="run" basedir=".">
-    <!-- Updated properties -->
-    <property name="src.dir" value="src/Analizador_Sintáctico_BYACCJ"/>
-    <property name="bin.dir" value="bin"/>
-    <property name="build.dir" value="bin"/>
-    <property name="test.file" value="src/Analizador_Sintáctico_BYACCJ/tst/prueba.txt"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="Practica4" default="help" basedir=".">
+    <!-- Global properties -->
+    <property name="base.build.dir" value="bin"/>
+    
+    <!-- Properties for Calculadora BYACCJ -->
+    <property name="calc.byaccj.src.dir" value="src"/>
+    <property name="calc.byaccj.build.dir" value="${base.build.dir}"/>
+    <property name="calc.byaccj.file" value="${calc.byaccj.src.dir}/Calculadora_BYACCJ/archivo.y"/>
+    
+    <!-- Properties for Calculadora BYACCJ+JFlex -->
+    <property name="calc.jflex.src.dir" value="src/Calculadora_BYACCJ_JFlex"/>
+    <property name="calc.jflex.build.dir" value="${base.build.dir}"/>
+    
+    <!-- Properties for Analizador Léxico -->
+    <property name="analizador.src.dir" value="src/Analizador_Sintactico_BYACCJ"/>
+    <property name="analizador.build.dir" value="${base.build.dir}"/>
 
-    <!-- Create required directories -->
-    <target name="init">
-        <mkdir dir="${bin.dir}"/>
+    <!-- Help target -->
+    <target name="help">
+        <echo>Available targets:
+
+    calc-byaccj:run           -  Run Calculadora BYACCJ
+    calc-jflex+byaccj:run     -  Run Calculadora BYACCJ+JFlex
+    analizador:test-all       -  Run all Analizador tests
+    analizador:test-base      -  Run base test
+    analizador:test-valid1    -  Run valid test 1
+    analizador:test-valid2    -  Run valid test 2
+    analizador:test-valid3    -  Run valid test 3
+    analizador:test-invalid1  -  Run invalid test 1
+    analizador:test-invalid2  -  Run invalid test 2
+    analizador:test-invalid3  -  Run invalid test 3
+        </echo>
     </target>
 
-    <!-- Generate Lexer and Parser -->
-    <target name="generate" depends="init">
-        <!-- Generate Lexer -->
+    <!-- =================== Calculadora BYACCJ Targets =================== -->
+    <target name="calc-byaccj:clean">
+        <delete dir="${calc.byaccj.build.dir}"/>
+        <delete file="${calc.byaccj.src.dir}/Calculadora_BYACCJ/Parser.java"/>
+        <delete file="${calc.byaccj.src.dir}/Calculadora_BYACCJ/ParserVal.java"/>
+    </target>
+
+    <target name="calc-byaccj:init">
+        <mkdir dir="${calc.byaccj.build.dir}"/>
+    </target>
+
+    <target name="calc-byaccj:generate" depends="calc-byaccj:init">
+        <condition property="byaccj.command" value="D:\\byaccj1.15_win32\\yacc.exe" else="byaccj">
+            <os family="windows"/>
+        </condition>
+        <exec executable="${byaccj.command}" failonerror="true">
+            <arg value="-J"/>
+            <arg value="${calc.byaccj.file}"/>
+        </exec>
+        <move todir="${calc.byaccj.src.dir}/Calculadora_BYACCJ">
+            <fileset dir="." includes="Parser*.java"/>
+        </move>
+    </target>
+
+    <target name="calc-byaccj:compile" depends="calc-byaccj:clean,calc-byaccj:generate">
+        <mkdir dir="${calc.byaccj.build.dir}"/>
+        <javac srcdir="${calc.byaccj.src.dir}/Calculadora_BYACCJ" destdir="${calc.byaccj.build.dir}" includeantruntime="false"/>
+    </target>
+
+    <target name="calc-byaccj:run" depends="calc-byaccj:compile">
+        <java classname="Parser" fork="false" failonerror="true">
+            <classpath>
+                <pathelement path="${calc.byaccj.build.dir}"/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- =================== Calculadora BYACCJ+JFlex Targets =================== -->
+    <target name="calc-jflex+byaccj:init">
+        <mkdir dir="${calc.jflex.build.dir}"/>
+    </target>
+
+    <target name="calc-jflex+byaccj:generate" depends="calc-jflex+byaccj:init">
         <condition property="jflex.command" value="jflex.bat" else="jflex">
             <os family="windows"/>
         </condition>
         <exec executable="${jflex.command}">
             <arg value="-d"/>
-            <arg value="${src.dir}"/>
-            <arg value="${src.dir}/jflex/Lexer.flex"/>
+            <arg value="${calc.jflex.src.dir}"/>
+            <arg value="${calc.jflex.src.dir}/jflex/Lexer.flex"/>
         </exec>
+        <exec executable="byaccj" failonerror="true">
+            <arg value="-Jclass=Parser"/>
+            <arg value="-Jpackage=src.Calculadora_BYACCJ_JFlex"/>
+            <arg value="-J"/>
+            <arg value="${calc.jflex.src.dir}/byacc/Parser.y"/>
+        </exec>
+        <move todir="${calc.jflex.src.dir}">
+            <fileset dir="." includes="Parser*.java"/>
+        </move>
     </target>
 
-    <!-- Clean build files -->
-    <target name="clean">
-        <delete dir="${build.dir}"/>
+    <target name="calc-jflex+byaccj:clean">
+        <delete dir="${calc.jflex.build.dir}"/>
         <delete>
-            <fileset dir="${src.dir}" includes="Lexer.java"/>
+            <fileset dir="${calc.jflex.src.dir}" includes="Lexer.java,Parser*.java"/>
         </delete>
     </target>
 
-    <!-- Compile all Java files -->
-    <target name="compile" depends="clean, generate">
-        <mkdir dir="${build.dir}"/>
-        
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
-            <classpath>
-                <pathelement location="${src.dir}"/>
-            </classpath>
-            <include name="**/*.java"/>
-        </javac>
+    <target name="calc-jflex+byaccj:compile" depends="calc-jflex+byaccj:clean,calc-jflex+byaccj:generate">
+        <mkdir dir="${calc.jflex.build.dir}"/>
+        <javac srcdir="${calc.jflex.src.dir}" destdir="${calc.jflex.build.dir}" includeantruntime="false"/>
     </target>
 
-    <!-- Run the calculator -->
-    <target name="run" depends="compile">
-        <java classname="src.Analizador_Sintáctico_BYACCJ.Main" fork="true" failonerror="true">
+    <target name="calc-jflex+byaccj:run" depends="calc-jflex+byaccj:compile">
+        <java classname="src.Calculadora_BYACCJ_JFlex.Main" fork="false" failonerror="true">
             <classpath>
-                <pathelement location="${build.dir}"/>
+                <pathelement path="${calc.jflex.build.dir}"/>
+                <pathelement path="."/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- =================== Analizador Léxico Targets =================== -->
+    <target name="analizador:init">
+        <mkdir dir="${analizador.build.dir}"/>
+    </target>
+
+    <target name="analizador:generate" depends="analizador:init">
+        <condition property="jflex.command" value="jflex.bat" else="jflex">
+            <os family="windows"/>
+        </condition>
+        <exec executable="${jflex.command}" failonerror="true">
+            <arg value="-d"/>
+            <arg value="${analizador.src.dir}"/>
+            <arg value="${analizador.src.dir}/jflex/Lexer.flex"/>
+        </exec>
+        <exec executable="byaccj" failonerror="true">
+            <arg value="-Jclass=Parser"/>
+            <arg value="-Jpackage=src.Analizador_Sintactico_BYACCJ"/>
+            <arg value="-J"/>
+            <arg value="${analizador.src.dir}/byacc/Parser.y"/>
+        </exec>
+        <move todir="${analizador.src.dir}">
+            <fileset dir="." includes="Parser*.java"/>
+        </move>
+    </target>
+
+    <target name="analizador:clean">
+        <delete dir="${analizador.build.dir}"/>
+        <delete verbose="true">
+            <fileset dir="${analizador.src.dir}">
+                <include name="Lexer.java"/>
+                <include name="Lexer.java~"/>
+                <include name="Parser*.java"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="y.output"/>
+                <include name="yacc.oa*"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="analizador:compile" depends="analizador:clean,analizador:generate">
+        <mkdir dir="${analizador.build.dir}"/>
+        <javac srcdir="${analizador.src.dir}" destdir="${analizador.build.dir}" includeantruntime="false"/>
+    </target>
+
+    <target name="analizador:run-test" depends="analizador:compile">
+        <java classname="src.Analizador_Sintactico_BYACCJ.Main" fork="true" failonerror="false">
+            <classpath>
+                <pathelement location="${analizador.build.dir}"/>
                 <pathelement location="."/>
             </classpath>
-            <arg value="${test.file}"/>
+            <arg value="${file}"/>
         </java>
+    </target>
+
+    <!-- Individual test targets -->
+    <target name="analizador:test-base">
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-valid1" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba1_Valida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-valid2" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba2_Valida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-valid3" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba3_Valida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-invalid1" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba4_Inválida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-invalid2" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba5_Inválida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-invalid3" >
+        <antcall target="analizador:run-test">
+            <param name="file" value="${analizador.src.dir}/tst/prueba6_Inválida.txt"/>
+        </antcall>
+    </target>
+
+    <target name="analizador:test-all"
+            depends="analizador:test-base,
+                     analizador:test-valid1,
+                     analizador:test-valid2,
+                     analizador:test-valid3,
+                     analizador:test-invalid1,
+                     analizador:test-invalid2,
+                     analizador:test-invalid3">
     </target>
 
 </project>
