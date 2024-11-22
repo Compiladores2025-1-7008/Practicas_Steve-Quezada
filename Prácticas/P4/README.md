@@ -4,7 +4,7 @@
   <strong>Práctica 4: Analizadores sintácticos con BYACC/J (YACC)</strong> <br> 
   <strong>Profesora</strong>: Ariel Adara Mercado Martínez <br>
   <strong>Ayudante</strong>: Janeth Pablo Martínez <br>
-  <strong>Ayud. Lab.</strong>: Carlos Gerardo Acosta Hernández <br>
+  <strong>Ayud. Lab.</strong>: Carlos Gerardo Acosta Hernández <br> <br>
   <strong>Alumno</strong>: Kevin Steve Quezada Ordoñez <br>
 </p>
 
@@ -88,7 +88,7 @@ simboloNoTerminal : /* vacio */ [ accion1 ]
 
     a. Se escriben usando código en Java.
 
-    b. Para hacer referencia a los s ́ımbolos gramaticales se utilizan pseudovariables ```$1, $2, ...$N```
+    b. Para hacer referencia a los símbolos gramaticales se utilizan pseudovariables ```$1, $2, ...$N```
 
     c. ```$$``` representa el encabezado de la producción.
 
@@ -176,7 +176,7 @@ line: '\n'
 exp: NUM { $$ = $1; }
 | exp '+' exp { $$ = new ParserVal($1.dval + $3.dval); }
 | exp '-' exp { $$ = new ParserVal($1.dval - $3.dval); }
-| exp '*' exp { $$ = new ParserVal($1.dval * $3.dval); }
+| exp '*' exp { $$ = new ParserVal($1.dval   $3.dval); }
 | exp '/' exp { $$ = new ParserVal($1.dval / $3.dval); }
 | '-' exp %prec NEG { $$ = new ParserVal(-$2.dval); }
 | exp '^' exp { $$ = new ParserVal(Math.pow($1.dval, $3.dval)); }
@@ -228,7 +228,7 @@ void dotest()
   System.out.println("BYACC/J Calculator Demo");
   System.out.println("Note: Since this example uses the StringTokenizer");
   System.out.println("for simplicity, you will need to separate the items");
-  System.out.println("with spaces, i.e.: '( 3 + 5 ) * 2'");
+  System.out.println("with spaces, i.e.: '( 3 + 5 )   2'");
   while (true)
     {
       System.out.print("expression:");
@@ -252,75 +252,115 @@ public static void main(String args[])
 }
 ```
 
-
 #### Pasos para ejecutar la calculadora
-a. Transcribir el código anterior a un archivo con extensión .y dentro de la carpeta *src/__Calculadora BYACCJ__/* <br>
-b. Compilar mediante la instrucción: ```byaccj -J archivo.y``` <br>
-c. Comprobar se generaron los archivos _Parser.java_ y ParserVal.java <br>
-d. Compilar mediante: ```javac Parser.java``` <br>
-e. Ejecutar mediante: ```java Parser``` y seguir instrucciones para ingresar expresiones aritméticas al analizador
+
+#### Usando BYACCJ (Calculadora básica)
+
+Nota: Aunque se muestran los pasos individuales para mayor claridad, se puede ejecutar directamente usando `ant calc-byaccj:run`, ya que las dependencias están configuradas para ejecutar los pasos previos automáticamente.
+
+a. Generar el parser:
+   ```bash
+   $ ant calc-byaccj:generate
+   ```
+
+b. Verificar la generación de archivos:
+   - Comprobar que se generaron correctamente `Parser.java` y `ParserVal.java`
+
+   <br>
+
+c. Compilar los archivos:
+   ```bash
+   $ ant calc-byaccj:compile
+   ```
+
+d. Ejecutar la calculadora:
+   ```bash
+   $ ant calc-byaccj:run
+   ```
+
+e. Limpiar archivos generados anteriormente:
+   ```bash
+   $ ant calc-byaccj:clean
+   ```
 
 ### Ejercicios
 1. Reemplazar el _StringTokenizer_ utilizado en el método original ```int yylex()``` con un analizador léxico generado mediante JFLex combinando ambas tecnologías (_BYACCJ+JFlex_).
 2. Definir tokens para todos los operadores de la calculadora en ```archivo.y``` y devolverlos en los patrones que corresponda mediante acciones léxicas del archivo de _JFlex_. 
 3. La calculadora debe ser capaz de mantener su funcionamiento interactivo mediante la consola y/o ser capaz de leer un archivo de entrada.
 
+#### Usando BYACCJ+JFlex (Calculadora avanzada)
 
-### Estructura del directorio
-```c++
-P4
-├── README.md
-├── src
-│   └── main
-│       ├── java
-│       │   └── Main.java // Clase con el método main
-│       ├── jflex
-│       │   └── Lexer.flex // Definición del An. Léxico
-│       └── byacc
-│           └── Parser.y // Definición del An. Sintáctico
-└── tst
-    └── prueba.txt // Archivo de entrada prueba que debe ser aceptado por el parser
 
-```
+a. Generar el analizador léxico y sintáctico:
+   ```bash
+   $ ant calc-jflex+byaccj:generate
+   ```
 
-### Uso
+b. Verificar la generación de archivos:
+   - Comprobar que se generaron correctamente `Parser.java`, `ParserVal.java` y `Lexer.java`
 
-#### Compilacion
+  <br>
 
-```bash
-[P4/]$ jflex src/main/jflex/Lexer.flex
-[P4/src/main/byacc/]$ byaccj -J -Jpackage=main.byacc Parser.y
-[P4/]$ javac --source-path src -d build src/main/jflex/Main.java
-```
+c. Compilar los archivos:
+   ```bash
+   $ ant calc-jflex+byaccj:compile
+   ```
 
-#### Ejecucion
+d. Ejecutar la calculadora:
+   ```bash
+   $ ant calc-jflex+byaccj:run
+   ```
 
-```bash
-$ java -cp build main.java.Main tst/input.txt  
-```
+e. Limpiar archivos generados anteriormente:
+   ```bash
+   $ ant calc-jflex+byaccj:clean
+   ```
 
+<br>
 
 ### Ejercicios para la definción de un Analizador Sintáctico en BYACC/J
-Para la gramática de la práctica anterior (Práctica 3) o la siguiente G = ( N, Σ, P, S), descrita por las siguientes producciones: 
+Para la gramática: 
 ````
-P = {
-    S → Expr | Asig
-    Expr → Term Expr’
-    Expr’ → + Term Expr’ | - Term Expr’ | ε 
-    Term → Factor Term’
-    Term’ → * Factor Term’ | / Factor Term’| ε 
-    Factor → Num | Var | (Expr) | - Expr
-    Num → Entero Decimal
-    Decimal → . Entero | ε
-    Entero → Digito | Digito Entero
-    Digito→0|1|2|... |9 
-    Asig → var Var = Expr
-    Var → Letra Pos
-    Pos → Var | ε
-    Letra → _|a|b|... |z|A|B|... |Z
-}
+   programa → lista declaraciones cuerpo programa EOF
+    
+   cuerpo programa → bloque principal | lista sentencias
+   bloque principal → {lista sentencias}
+   lista declaraciones → lista declaraciones declaracion | declaracion
+   declaracion → tipo lista var ;
+   tipo → int | float
+   lista var → lista var , id | id
+   
+   lista sentencias → lista sentencias sentencia | sentencia
+   sentencias → {lista sentencias} | sentencia
+   
+   sentencia → asignacion
+   | if stmt
+   | while stmt
+   
+   asignacion → id = expresion ;
+   
+   if stmt → if (expresion) sentencias
+   | if (expresion) sentencias else sentencias
+   
+   while stmt → while (expresion) sentencias
+   
+   expresion → expresion + termino
+   | expresion − termino
+   | expresion < termino
+   | expresion > termino
+   | expresion <= termino
+   | expresion >= termino
+   | expresion == termino
+   | expresion ! = termino
+   | termino
+   
+   termino → termino ∗ factor
+   | termino / factor
+   | factor
+   
+   factor → (expresion)
+   | id | numero entero | numero real
 ````
-
 
 4. Determinar en un archivo Readme, en formato Markdown (.md) o LaTeX (.tex) -- con su respectivo PDF, para este último -- , los conjuntos _N_, _Σ_ y el símbolo inicial _S_.  (0.5 pts.)
 5. Mostrar en el archivo el proceso de eliminación de ambigüedad o justificar, en caso de no ser necesario. (1 pts.).
@@ -329,46 +369,92 @@ P = {
 8. Mostrar en el archivo los nuevos conjuntos _N_ y _P_. (0.5 pts.)
 9. Realizar cualquier otro tratamiento necesario para evitar conflictos de _shift/reduce_ mostrando el proceso.
 10. Crear una definición con _BYACC/J_ para la gramática resultante. 
-
----
-#### Extras
-
 11. Documentar el código. (0.25pts)
 12. Proponer 4 archivos de prueba nuevos, 2 válidos y 2 inválidos. (0.25pts)
 13. Crear un archivo build.xml para ANT que permita la automatización de la generación de los analizadores léxico y sintáctico y la compilación del resultado. 
 
 
-
-
-
-
-
-## Flujo General de los Comandos
-
-<!-- ### Ejecutar el analizador léxico: -->
-<!-- Este comando compilará el proyecto y luego ejecutará el analizador léxico: -->
-
-```bash
-$ ant run-calculator
+### Estructura del directorio
+```c++
+P4:
+│   build.xml
+│   Practica_04.pdf
+│   README.md
+│
+└───src
+    ├───Analizador_Sintactico_BYACCJ
+    │   │   ClaseLexica.java
+    │   │   Colors.java
+    │   │   Main.java
+    │   │   Token.java
+    │   │
+    │   ├───byacc
+    │   │       Parser.y
+    │   │
+    │   ├───jflex
+    │   │       Lexer.flex
+    │   │
+    │   └───tst
+    │           prueba.txt
+    │           prueba1_Valida.txt
+    │           prueba2_Valida.txt
+    │           prueba3_Valida.txt
+    │           prueba4_Inválida.txt
+    │           prueba5_Inválida.txt
+    │           prueba6_Inválida.txt
+    │
+    ├───Calculadora_BYACCJ
+    │       archivo.y
+    │
+    └───Calculadora_BYACCJ_JFlex
+        │   Main.java
+        │
+        ├───byacc
+        │       Parser.y
+        │
+        └───jflex
+                Lexer.flex
 ```
 
-<!-- ### Limpiar el directorio de compilación: -->
-<!-- Este comando eliminará todos los archivos generados en el proceso de compilación: -->
+#### Usando el Analizador Sintáctico
 
-```bash
-$ ant clean-calculator
-```
+Nota: Se pueden ejecutar las pruebas de diferentes maneras:
 
-<!-- ### Generar el analizador léxico: -->
-<!-- Si necesitas regenerar el archivo `Lexer.java`: -->
+1. Ejecutar todas las pruebas de una vez:
+   ```bash
+   $ ant analizador:test-all
+   ```
 
-```bash
-$ ant generate-calculator
-```
+2. Ejecutar pruebas individuales:
+   ```bash
+   # Prueba base
+   $ ant analizador:test-base
 
-<!-- ### Compilar el proyecto: -->
-<!-- Si deseas compilar el proyecto sin ejecutarlo: -->
+   # Pruebas válidas
+   $ ant analizador:test-valid1
+   $ ant analizador:test-valid2
+   $ ant analizador:test-valid3
 
-```bash
-$ ant compile-calculator
-```
+   # Pruebas inválidas
+   $ ant analizador:test-invalid1
+   $ ant analizador:test-invalid2
+   $ ant analizador:test-invalid3
+   ```
+
+3. También se pueden ejecutar los pasos individuales si se desea:
+
+   a. Generar el analizador léxico y sintáctico:
+      ```bash
+      $ ant analizador:generate
+      ```
+
+   b. Compilar los archivos:
+      ```bash
+      $ ant analizador:compile
+      ```
+      
+   c. Limpiar archivos generados:
+      ```bash
+      $ ant analizador:clean
+      ```
+````
