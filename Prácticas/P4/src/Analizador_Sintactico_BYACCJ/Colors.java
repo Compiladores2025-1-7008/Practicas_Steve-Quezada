@@ -1,4 +1,4 @@
-package src.Analizador_Sintáctico_BYACCJ;
+package src.Analizador_Sintactico_BYACCJ;
 
 /**
  * Clase que se encarga de guardar <strong>las cadenas de formato</strong>

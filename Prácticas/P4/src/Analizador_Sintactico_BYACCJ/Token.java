@@ -1,4 +1,4 @@
-package src.Analizador_Sintáctico_BYACCJ;
+package src.Analizador_Sintactico_BYACCJ;
 
 /**
  * Clase Token que representa un token en el análisis léxico.

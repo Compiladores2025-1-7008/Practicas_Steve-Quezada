@@ -1,6 +1,5 @@
-package src.Analizador_Sintáctico_BYACCJ;
+package src.Analizador_Sintactico_BYACCJ;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
@@ -24,15 +23,14 @@ public class Main {
             System.exit(1);
         }
 
-        Colors.println("Analizador Sintáctico de descenso recursivo.", Colors.HIGH_INTENSITY);
+        Colors.println("Analizador Sintáctico BYACCJ + JFlex", Colors.HIGH_INTENSITY);
         Colors.println("Archivo de Entrada: " + args[0], Colors.HIGH_INTENSITY);
 
         try {
-            Lexer lexer = new Lexer(new FileReader(args[0]));
-            Parser parser = new Parser(lexer);
-            parser.parse();
-        } catch (FileNotFoundException fnfe) {
-            System.err.println("Error: No fue posible leer del archivo de entrada: " + args[0]);
+            Parser parser = new Parser(new FileReader(args[0]));
+            parser.yyparse();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
             System.exit(1);
         }
     }

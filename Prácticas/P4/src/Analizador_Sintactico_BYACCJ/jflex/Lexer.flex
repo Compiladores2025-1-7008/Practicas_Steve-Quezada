@@ -1,16 +1,24 @@
-package src.Analizador_Sintáctico_BYACCJ;
+/**
+ * Analizador Léxico para el lenguaje C_1
+ *
+ * Este archivo define las reglas léxicas para reconocer los tokens del lenguaje C_1,
+ * incluyendo palabras reservadas, identificadores, números, operadores y símbolos.
+ *
+ * Tokens reconocidos:
+ * - Palabras reservadas: int, float, if, else, while
+ * - Identificadores: secuencias de letras y dígitos que comienzan con letra
+ * - Números: enteros y reales
+ * - Operadores: +, -, *, /, =, ==, <, >, <=, >=, !=
+ * - Símbolos: (, ), {, }, ;, ,
+ *
+ * @author steve-quezada
+ */
+
+package src.Analizador_Sintactico_BYACCJ;
 
 %%
 
 %{
-/**
- * Clase Lexer que implementa un analizador léxico utilizando JFlex.
- * 
- * Esta clase se encarga de leer el código fuente y dividirlo en tokens
- * que serán utilizados por el analizador sintáctico.
- * 
- * @author steve-quezada
- */
 public Token actual;
 
 /**
@@ -28,44 +36,49 @@ public int getLine() { return yyline + 1; }
  */
 public void printLexicalState(String lexema, ClaseLexica claseLexica) {
     String color = claseLexica.getColor();
-    Colors.print("\nToken: " + lexema + 
-                 " | Clase: " + claseLexica.getNombre() + 
-                 " | Línea: " + getLine(), color);
+    int valor = claseLexica.ordinal() + 257;
+    Colors.println("\nToken: " + lexema + 
+                  " | Clase: " + claseLexica.getNombre() + 
+                  " | Línea: " + getLine() +
+                  " | Valor: " + valor, color);
 }
+
+private boolean eofAlcanzado = false;
 %}
 
-%public
+%public           
 %class Lexer
 %standalone
 %unicode
 %line
 %type Token
 
-espacio = [ \t\n]
-letra = [a-zA-Z_]
-digito = [0-9]
-identificador = {letra}({letra}|{digito})*
-numero_entero = {digito}+
-numero_real = {digito}+"."{digito}+
+/* Definición de expresiones regulares básicas */
+espacio = [ \t\n]                           /* Espacios en blanco, tabulaciones y saltos de línea */
+letra = [a-zA-Z_]                           /* Letras y guión bajo */
+digito = [0-9]                              /* Dígitos del 0 al 9 */
+identificador = {letra}({letra}|{digito})*  /* Patrón para identificadores */
+numero_entero = {digito}+                   /* Números enteros */
+numero_real = {digito}+"."{digito}+         /* Números reales con punto decimal */
 
 %%
+/* Reglas léxicas */
 
 {espacio}+ { /* Ignorar espacios en blanco */ }
 
+/* Palabras reservadas */
 "int"    { printLexicalState(yytext(), ClaseLexica.INT); return new Token(ClaseLexica.INT, yytext(), getLine()); }
 "float"  { printLexicalState(yytext(), ClaseLexica.FLOAT); return new Token(ClaseLexica.FLOAT, yytext(), getLine()); }
 "if"     { printLexicalState(yytext(), ClaseLexica.IF); return new Token(ClaseLexica.IF, yytext(), getLine()); }
 "else"   { printLexicalState(yytext(), ClaseLexica.ELSE); return new Token(ClaseLexica.ELSE, yytext(), getLine()); }
 "while"  { printLexicalState(yytext(), ClaseLexica.WHILE); return new Token(ClaseLexica.WHILE, yytext(), getLine()); }
 
-// Identificadores
+/* Identificadores y números */
 {identificador} { printLexicalState(yytext(), ClaseLexica.ID); return new Token(ClaseLexica.ID, yytext(), getLine()); }
-
-// Números
 {numero_entero} { printLexicalState(yytext(), ClaseLexica.NUMERO_ENTERO); return new Token(ClaseLexica.NUMERO_ENTERO, yytext(), getLine()); }
 {numero_real}   { printLexicalState(yytext(), ClaseLexica.NUMERO_REAL); return new Token(ClaseLexica.NUMERO_REAL, yytext(), getLine()); }
 
-// Símbolos y operadores
+/* Símbolos y operadores */
 ";"   { printLexicalState(yytext(), ClaseLexica.PYC); return new Token(ClaseLexica.PYC, yytext(), getLine()); }
 ","   { printLexicalState(yytext(), ClaseLexica.COMA); return new Token(ClaseLexica.COMA, yytext(), getLine()); }
 "("   { printLexicalState(yytext(), ClaseLexica.LPAR); return new Token(ClaseLexica.LPAR, yytext(), getLine()); }
@@ -81,15 +94,22 @@ numero_real = {digito}+"."{digito}+
 "*"   { printLexicalState(yytext(), ClaseLexica.MULTIPLICACION); return new Token(ClaseLexica.MULTIPLICACION, yytext(), getLine()); }
 "/"   { printLexicalState(yytext(), ClaseLexica.DIVISION); return new Token(ClaseLexica.DIVISION, yytext(), getLine()); }
 
-// Operadores relacionales y lógicos
+/* Operadores relacionales y lógicos */
 ">="  { printLexicalState(yytext(), ClaseLexica.MAYORIGUAL); return new Token(ClaseLexica.MAYORIGUAL, yytext(), getLine()); }
 "<="  { printLexicalState(yytext(), ClaseLexica.MENORIGUAL); return new Token(ClaseLexica.MENORIGUAL, yytext(), getLine()); }
 "!="  { printLexicalState(yytext(), ClaseLexica.DIFERENTE); return new Token(ClaseLexica.DIFERENTE, yytext(), getLine()); }
 
-// Fin de archivo
-<<EOF>> { printLexicalState("EOF", ClaseLexica.EOF); return new Token(ClaseLexica.EOF, "EOF", getLine()); }
+/* Manejo del fin de archivo */
+<<EOF>> { 
+    if (!eofAlcanzado) {
+        eofAlcanzado = true;
+        printLexicalState("EOF", ClaseLexica.EOF); 
+        return new Token(ClaseLexica.EOF, "EOF", getLine()); 
+    }
+    return null;
+}
 
-// Caracteres no reconocidos
+/* Manejo de caracteres no reconocidos */
 . { 
     Colors.println("\nError: Símbolo no reconocido '" + yytext() + 
                    "' en línea " + getLine() + ".", Colors.RED); 

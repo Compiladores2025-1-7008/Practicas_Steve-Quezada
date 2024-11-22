@@ -1,4 +1,4 @@
-package src.Analizador_Sintáctico_BYACCJ;
+package src.Analizador_Sintactico_BYACCJ;
 
 /**
  * Enumeración ClaseLexica que define los diferentes tipos de tokens que el
