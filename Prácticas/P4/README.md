@@ -457,4 +457,3 @@ Nota: Se pueden ejecutar las pruebas de diferentes maneras:
       ```bash
       $ ant analizador:clean
       ```
-````
